@@ -40,7 +40,6 @@ class Rpc_client extends RPC {
         this.channel.consume(this.rpcReplyQueue.queue, function (msg) {
             let instance = JSON.parse(msg.content.toString());
             let {id, result} = instance;
-            // let newWaitingKeys = [];
             Object.keys(that.waitings).map(_id => {
                 if (_id === id) {
                     that.waitings[id].resolve(result);
@@ -56,18 +55,8 @@ class Rpc_client extends RPC {
             this.replyInterval = null;
             return;
         }
-
-
         Object.keys(this.waitings).map(id => {
             let waiting = this.waitings[id];
-            try {
-                this.waitings[id].time;
-            } catch (e) {
-                console.log('waitings:', this.waitings);
-                // console.log('waitingKeys:', this.waitingKeys);
-                console.log('id:', id);
-                throw e;
-            }
             if (moment().add(-waiting.timeout, 'milliseconds').isAfter(this.waitings[id].time)) {
                 delete this.waitings[id];
                 waiting.reject({
@@ -84,7 +73,6 @@ class Rpc_client extends RPC {
         let that = this;
         let id = uuid();
         let p = new PromiseA(function (resolve, reject) {
-            // that.waitingKeys.push(id);
             that.waitings[id] = {
                 id,
                 resolve,
