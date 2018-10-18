@@ -11,8 +11,6 @@ client.$promise.then(() => {
         }).then(result => {
             console.log(JSON.stringify(result) + ':' + i);
         })
-
-
     }, 1);
 });
 
