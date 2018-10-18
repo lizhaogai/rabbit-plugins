@@ -3,7 +3,7 @@ const RPC = require('./rpc');
 
 const debug = require('debug')('rabbit:service:rpc:hash*');
 
-class Server extends RPC {
+class Rpc_server extends RPC {
 
     constructor(url) {
         super(url);
@@ -49,4 +49,4 @@ class Server extends RPC {
 }
 
 
-module.exports = Server;
+module.exports = Rpc_server;

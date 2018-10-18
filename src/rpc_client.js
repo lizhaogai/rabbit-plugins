@@ -6,7 +6,7 @@ const moment = require('moment');
 
 const debug = require('debug')('rabbit:service:rpc:hash*');
 
-class Client extends RPC {
+class Rpc_client extends RPC {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts.url);
@@ -112,4 +112,4 @@ class Client extends RPC {
     }
 }
 
-module.exports = Client;
+module.exports = Rpc_client;
