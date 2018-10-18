@@ -13,7 +13,6 @@ class Client extends RPC {
         this.timeout = opts.timeout || 3000;
         this.replyInterval = null;
         this.waitings = {};
-        // this.waitingKeys = [];
         this.start();
     }
 
@@ -48,17 +47,6 @@ class Client extends RPC {
                     delete that.waitings[id];
                 }
             });
-            // for (let index of that.waitingKeys.keys()) {
-            //     let _id = that.waitingKeys[index];
-            //     let waiting = that.waitings[id];
-            //     if (_id === id) {
-            //         delete that.waitings[id];
-            //         waiting.resolve(result);
-            //     } else {
-            //         newWaitingKeys.push(id);
-            //     }
-            // }
-            // that.waitingKeys = newWaitingKeys;
         }, {noAck: true});
     }
 
@@ -68,8 +56,6 @@ class Client extends RPC {
             this.replyInterval = null;
             return;
         }
-
-        // let newWaitingKeys = [];
 
 
         Object.keys(this.waitings).map(id => {
@@ -92,32 +78,6 @@ class Client extends RPC {
                 });
             }
         });
-        // for (let index of this.waitingKeys.keys()) {
-        //     let id = this.waitingKeys[index];
-        //     let waiting = this.waitings[id];
-        //     try {
-        //         this.waitings[id].time;
-        //     } catch (e) {
-        //         console.log('waitings:', this.waitings);
-        //         console.log('waitingKeys:', this.waitingKeys);
-        //         console.log('id:', id);
-        //         throw e;
-        //     }
-        //     if (moment().add(-waiting.timeout, 'milliseconds').isAfter(this.waitings[id].time)) {
-        //         delete this.waitings[id];
-        //         waiting.reject({
-        //             type: 'TIMEOUT',
-        //             code: 406,
-        //             status: 406,
-        //             message: 'Timeout to handle.'
-        //         });
-        //     } else {
-        //         newWaitingKeys.push(id);
-        //     }
-        // }
-        //
-        // this.waitingKeys = newWaitingKeys;
-
     }
 
     async call(methodName, ...args) {
