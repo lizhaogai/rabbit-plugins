@@ -13,6 +13,7 @@ class Rpc_server extends RPC {
 
     async _server() {
         let that = this;
+        that.channel.prefetch(1);
         this.channel.consume(this.rpcQueue, async function (msg) {
             try {
                 let instance = JSON.parse(msg.content.toString());

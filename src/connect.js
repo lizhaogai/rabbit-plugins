@@ -6,6 +6,9 @@ var amqp = require('amqplib/callback_api');
 class Connect {
     constructor(url) {
         this.url = url;
+        this.$promise = new PromiseA((resolve, reject) => {
+            this._$promise = {resolve, reject}
+        });
     }
 
     async _connect() {
@@ -27,7 +30,9 @@ class Connect {
 
     start() {
         this._connect().then(() => {
-            this._start()
+            this._$promise && this._$promise.resolve();
+            this._$promise = null;
+            this._start && this._start()
         })
     }
 }
