@@ -10,10 +10,10 @@ class Client extends RPC {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts.url);
-        this.timeout = opts.timeout || 3100;
+        this.timeout = opts.timeout || 3000;
         this.replyInterval = null;
         this.waitings = {};
-        this.waitingKeys = [];
+        // this.waitingKeys = [];
         this.start();
     }
 
@@ -41,34 +41,48 @@ class Client extends RPC {
         this.channel.consume(this.rpcReplyQueue.queue, function (msg) {
             let instance = JSON.parse(msg.content.toString());
             let {id, result} = instance;
-            let newWaitingKeys = [];
-            for (let index of that.waitingKeys.keys()) {
-                let _id = that.waitingKeys[index];
-                let waiting = that.waitings[id];
+            // let newWaitingKeys = [];
+            Object.keys(that.waitings).map(_id => {
                 if (_id === id) {
+                    that.waitings[id].resolve(result);
                     delete that.waitings[id];
-                    waiting.resolve(result);
-                } else {
-                    newWaitingKeys.push(id);
                 }
-            }
-            that.waitingKeys = newWaitingKeys;
+            });
+            // for (let index of that.waitingKeys.keys()) {
+            //     let _id = that.waitingKeys[index];
+            //     let waiting = that.waitings[id];
+            //     if (_id === id) {
+            //         delete that.waitings[id];
+            //         waiting.resolve(result);
+            //     } else {
+            //         newWaitingKeys.push(id);
+            //     }
+            // }
+            // that.waitingKeys = newWaitingKeys;
         }, {noAck: true});
     }
 
     checkTimeout() {
-        if (this.waitingKeys.length == 0) {
+        if (Object.keys(this.waitings).length == 0) {
             clearInterval(this.replyInterval);
             this.replyInterval = null;
             return;
         }
 
-        let newWaitingKeys = [];
-        for (let index of this.waitingKeys.keys()) {
-            let id = this.waitingKeys[index];
+        // let newWaitingKeys = [];
+
+
+        Object.keys(this.waitings).map(id => {
             let waiting = this.waitings[id];
-            let startAt = this.waitings[id].time;
-            if (moment().add(-waiting.timeout, 'milliseconds').isAfter(startAt)) {
+            try {
+                this.waitings[id].time;
+            } catch (e) {
+                console.log('waitings:', this.waitings);
+                // console.log('waitingKeys:', this.waitingKeys);
+                console.log('id:', id);
+                throw e;
+            }
+            if (moment().add(-waiting.timeout, 'milliseconds').isAfter(this.waitings[id].time)) {
                 delete this.waitings[id];
                 waiting.reject({
                     type: 'TIMEOUT',
@@ -76,12 +90,33 @@ class Client extends RPC {
                     status: 406,
                     message: 'Timeout to handle.'
                 });
-            } else {
-                newWaitingKeys.push(id);
             }
-        }
-
-        this.waitingKeys = newWaitingKeys;
+        });
+        // for (let index of this.waitingKeys.keys()) {
+        //     let id = this.waitingKeys[index];
+        //     let waiting = this.waitings[id];
+        //     try {
+        //         this.waitings[id].time;
+        //     } catch (e) {
+        //         console.log('waitings:', this.waitings);
+        //         console.log('waitingKeys:', this.waitingKeys);
+        //         console.log('id:', id);
+        //         throw e;
+        //     }
+        //     if (moment().add(-waiting.timeout, 'milliseconds').isAfter(this.waitings[id].time)) {
+        //         delete this.waitings[id];
+        //         waiting.reject({
+        //             type: 'TIMEOUT',
+        //             code: 406,
+        //             status: 406,
+        //             message: 'Timeout to handle.'
+        //         });
+        //     } else {
+        //         newWaitingKeys.push(id);
+        //     }
+        // }
+        //
+        // this.waitingKeys = newWaitingKeys;
 
     }
 
@@ -89,7 +124,7 @@ class Client extends RPC {
         let that = this;
         let id = uuid();
         let p = new PromiseA(function (resolve, reject) {
-            that.waitingKeys.push(id);
+            // that.waitingKeys.push(id);
             that.waitings[id] = {
                 id,
                 resolve,
