@@ -8,6 +8,7 @@ class Server extends RPC {
     constructor(url) {
         super(url);
         this.start();
+        this._rpcHandlers = {};
     }
 
     async _server() {
@@ -16,8 +17,8 @@ class Server extends RPC {
             try {
                 let instance = JSON.parse(msg.content.toString());
                 let {id, methodName, args} = instance;
-                const handler = R.propOr(R.always(null), methodName, that._rpcHandlers);
-                if (handler) {
+                if (that._rpcHandlers[methodName]) {
+                    const handler = R.propOr(R.always(null), methodName, that._rpcHandlers);
                     const data = await handler.apply(handler, args);
                     that.channel.publish(that.rpcReplyExchange, '', new Buffer(JSON.stringify({id, result: data})));
                 }
