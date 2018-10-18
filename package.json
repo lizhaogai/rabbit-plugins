@@ -1,0 +1,42 @@
+{
+  "name": "rabbit-plugins",
+  "version": "0.0.4",
+  "description": "simple distributed RPC using Hydra",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "babel --presets=es2017,stage-3 src --out-dir dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecwyne/hydra-plugin-rpc.git"
+  },
+  "keywords": [
+    "hydra",
+    "microservices",
+    "rpc"
+  ],
+  "author": "Eric Wyne <ecwyne@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ecwyne/hydra-plugin-rpc/issues"
+  },
+  "homepage": "https://github.com/ecwyne/hydra-plugin-rpc#readme",
+  "dependencies": {
+    "amqplib": "^0.5.2",
+    "bluebird": "^3.5.2",
+    "debug": "^4.1.0",
+    "errs": "^0.3.2",
+    "moment": "^2.22.2",
+    "ramda": "^0.25.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.2",
+    "babel-preset-es2017": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "eslint": "^3.19.0",
+    "eslint-plugin-babel": "^4.1.1"
+  }
+}
