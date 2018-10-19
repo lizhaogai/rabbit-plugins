@@ -9,19 +9,15 @@ const codecs = require('./codecs');
 class Connect {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts};
-        this.opts = opts || {};
+        this.opts = opts = opts || {};
         this.url = opts.url;
-        this.$promise = new PromiseA((resolve, reject) => {
-            this._$promise = {resolve, reject}
-        });
-
         this.conn = null;
         this.channel = null;
         this.connected = false;
         this.routers = [];
         this.$promise = null;
-        EventEmitter.call(this);
         this.codec = codecs.byName(this.opts.format || 'json');
+        EventEmitter.call(this);
         this._connect();
     }
 
@@ -59,7 +55,6 @@ class Connect {
             let channel = await PromiseA.fromCallback(cb => this.conn.createChannel(cb));
             this.channel = channel;
             this.emit('connected');
-
             return;
         });
 

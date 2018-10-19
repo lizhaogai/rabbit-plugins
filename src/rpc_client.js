@@ -9,7 +9,7 @@ const debug = require('debug')('rabbit:service:rpc:client');
 class Rpc_client extends RPC {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
-        super(opts.url);
+        super(opts);
         this.timeout = opts.timeout || 3000;
         this.replyInterval = null;
         this.waitings = {};

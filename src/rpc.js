@@ -8,8 +8,8 @@ const rpcQueue = 'rabbit:service:rpc:queue';
 const rpcReplyExchange = 'rabbit:service:rpc:reply:exchange';
 
 class RPC extends Connect {
-    constructor(url) {
-        super(url);
+    constructor(opts) {
+        super(opts);
         this.rpcQueue = rpcQueue;
         this.rpcReplyExchange = rpcReplyExchange
     }

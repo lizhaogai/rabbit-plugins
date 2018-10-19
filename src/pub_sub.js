@@ -4,7 +4,7 @@ const PromiseA = require('bluebird');
 class PubSub extends Connect {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
-        super(opts.url);
+        super(opts);
         this._subscribeTopics = {};
         this.pubSubEx = 'rabbit:pubsub:ex';
         this.topicPrefix = opts.topicPrefix || 'rabbit:pubsub:';

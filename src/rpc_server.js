@@ -5,8 +5,9 @@ const debug = require('debug')('rabbit:service:rpc:server');
 
 class Rpc_server extends RPC {
 
-    constructor(url) {
-        super(url);
+    constructor(opts) {
+        opts = (typeof opts) === 'object' ? opts : {url: opts}
+        super(opts);
         this._rpcHandlers = {};
     }
 
