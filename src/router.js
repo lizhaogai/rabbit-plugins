@@ -89,15 +89,22 @@ function Router(route, options, handler) {
         debug('init', options.url, that.route);
         this.consumerTag = consumerTag();
 
-        var open = this.connection = options.connection;
-
-        this.$promise = open.then(function (conn) {
+        var open = options.client;
+        var conn = options.client.conn;
+        this.$promise = open.$promise.then(function () {
             conn.on('error', that.cleanup);
-            var ok = conn.createChannel();
-            return ok.then(subscribe).then(function () {
-                return ok;
-            });
+            // var ok = conn.createChannel();
+            // return ok.then(subscribe).then(function () {
+            //     return ok;
+            // });
+            return subscribe(options.client.channel);
         });
         return this.$promise;
     };
+
+    this.cleanup = function (err) {
+        console.error('Exiting due to connection error: ', err);
+        process.exit(-1);
+    };
+
 }

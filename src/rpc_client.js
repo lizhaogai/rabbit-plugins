@@ -18,7 +18,9 @@ class Rpc_client extends RPC {
 
     async _connect() {
         await super._connect();
-        let rpcReplyQueue = await PromiseA.fromCallback(cb => this.channel.assertQueue('', {exclusive: true}, cb)).catch(e => {
+        let queneOpts = this.queueOpts;
+        queneOpts.exclusive = true;
+        let rpcReplyQueue = await PromiseA.fromCallback(cb => this.channel.assertQueue('', queneOpts, cb)).catch(e => {
             debug(e);
             return null;
         });
@@ -37,8 +39,8 @@ class Rpc_client extends RPC {
 
     async _client() {
         let that = this;
-        this.channel.bindQueue(this.rpcReplyQueue.queue, this.rpcReplyExchange, '');
-        this.channel.consume(this.rpcReplyQueue.queue, function (msg) {
+        that.channel.bindQueue(this.rpcReplyQueue.queue, this.rpcReplyExchange, '');
+        that.channel.consume(this.rpcReplyQueue.queue, function (msg) {
             let instance = that.codec.decode(msg.content.toString());
             let {id, result} = instance;
             Object.keys(that.waitings).map(_id => {
@@ -47,7 +49,8 @@ class Rpc_client extends RPC {
                     delete that.waitings[id];
                 }
             });
-        }, {noAck: true});
+            that.channel.ack(msg);
+        });
     }
 
     checkTimeout() {

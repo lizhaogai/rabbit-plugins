@@ -7,15 +7,13 @@ let timeInertal = null;
 client.on('connected', () => {
     timeInertal = setInterval(async function () {
         i++;
-        client.call('add', 1, 2, i).catch(e => {
+        client.call('add', 3, 4, i).catch(e => {
             return e;
         }).then(result => {
             console.log(JSON.stringify(result) + ':' + i);
         })
     }, 1000);
 });
-
-
 
 client.on('close', function () {
     console.log('client closed')

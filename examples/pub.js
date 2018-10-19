@@ -8,7 +8,6 @@ pub.$promise.then(() => {
         i++;
         pub.publish('test', i)
     }, 1000);
-
 });
 
 

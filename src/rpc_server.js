@@ -30,11 +30,12 @@ class Rpc_server extends RPC {
                     const data = await handler.apply(handler, args);
                     const content = that.bufferify(that.codec.encode({id, result: data}));
                     that.channel.publish(that.rpcReplyExchange, '', content);
+                    that.channel.ack(msg);
                 }
             } catch (e) {
                 debug(e);
             }
-        }, {noAck: true});
+        });
     }
 
 

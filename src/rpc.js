@@ -12,12 +12,13 @@ class RPC extends Client {
         super(opts);
         this.rpcQueue = rpcQueue;
         this.rpcReplyExchange = rpcReplyExchange
+        this.queueOpts = {durable: true, autoDelete: false, messageTtl: 30000, expires: 3600000};
     }
 
     async _connect() {
         await super._connect();
-        this.channel.assertQueue(this.rpcQueue, {durable: false}); //TODO queue ack and queue duration
-        this.channel.assertExchange(this.rpcReplyExchange, 'fanout', {durable: false});
+        this.channel.assertQueue(this.rpcQueue, this.queueOpts); //TODO queue ack and queue duration
+        this.channel.assertExchange(this.rpcReplyExchange, 'fanout');
     }
 
 }

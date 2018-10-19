@@ -49,7 +49,8 @@ class Client {
                 this.connected = false;
                 this.emit('close');
             });
-            conn.on('error', () => {
+            conn.on('error', (e) => {
+                console.log(e);
                 this.connected = false;
                 this.emit('error');
             });
@@ -117,7 +118,7 @@ class Client {
         return this.$promise.then(function () {
             var codec = that.codec;
             options = options || {};
-            options.connection = that.conn;
+            options.client = that;
             var router = new Router(route, options, function (message) {
                 PromiseA.try(function () {
                     message.payload = codec.decode(message.content);
