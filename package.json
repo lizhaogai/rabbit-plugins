@@ -27,8 +27,11 @@
     "bluebird": "^3.5.2",
     "debug": "^4.1.0",
     "errs": "^0.3.2",
+    "events": "^3.0.0",
     "moment": "^2.22.2",
+    "msgpack": "^1.0.2",
     "ramda": "^0.25.0",
+    "util": "^0.11.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

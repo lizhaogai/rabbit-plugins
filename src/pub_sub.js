@@ -5,18 +5,14 @@ class PubSub extends Connect {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts.url);
-        this._publichTopics = {};
         this._subscribeTopics = {};
         this.pubSubEx = 'rabbit:pubsub:ex';
         this.topicPrefix = opts.topicPrefix || 'rabbit:pubsub:';
         this.topicSuffix = opts.topicSuffix || ':$';
-        this.start();
     }
 
     async _connect() {
         await super._connect();
-        let channel = await PromiseA.fromCallback(cb => this.conn.createChannel(cb));
-        this.channel = channel;
         this.channel.assertExchange(this.pubSubEx, 'topic', {durable: false});
     }
 

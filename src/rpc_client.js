@@ -4,7 +4,7 @@ const errs = require('errs');
 const RPC = require('./rpc');
 const moment = require('moment');
 
-const debug = require('debug')('rabbit:service:rpc:hash*');
+const debug = require('debug')('rabbit:service:rpc:client');
 
 class Rpc_client extends RPC {
     constructor(opts) {
@@ -13,7 +13,7 @@ class Rpc_client extends RPC {
         this.timeout = opts.timeout || 3000;
         this.replyInterval = null;
         this.waitings = {};
-        this.start();
+        this.debug = debug;
     }
 
     async _connect() {
@@ -32,13 +32,14 @@ class Rpc_client extends RPC {
         }
 
         this.rpcReplyQueue = rpcReplyQueue;
+        await this._client();
     }
 
     async _client() {
         let that = this;
         this.channel.bindQueue(this.rpcReplyQueue.queue, this.rpcReplyExchange, '');
         this.channel.consume(this.rpcReplyQueue.queue, function (msg) {
-            let instance = JSON.parse(msg.content.toString());
+            let instance = that.codec.decode(msg.content.toString());
             let {id, result} = instance;
             Object.keys(that.waitings).map(_id => {
                 if (_id === id) {
@@ -86,8 +87,11 @@ class Rpc_client extends RPC {
                     that.checkTimeout();
                 }, 1000);
             }
-
-            that.channel.sendToQueue(that.rpcQueue, new Buffer(JSON.stringify({id, methodName, args, jsonrpc: '2.0'})));
+            const body = that.codec.encode({id, methodName, args, jsonrpc: '2.0'});
+            debug('Send remote call ', body);
+            const content = that.bufferify(body);
+            // that.channel.sendToQueue(that.rpcQueue, new Buffer(JSON.stringify({id, methodName, args, jsonrpc: '2.0'})));
+            that.channel.sendToQueue(that.rpcQueue, content);
         });
         p.timeout = function (timeout) {
             that.waitings[id].timeout = timeout || that.timeout;
@@ -95,9 +99,6 @@ class Rpc_client extends RPC {
         return p;
     }
 
-    async _start() {
-        await this._client();
-    }
 }
 
 module.exports = Rpc_client;

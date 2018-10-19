@@ -16,8 +16,6 @@ class RPC extends Connect {
 
     async _connect() {
         await super._connect();
-        let channel = await PromiseA.fromCallback(cb => this.conn.createChannel(cb));
-        this.channel = channel;
         this.channel.assertQueue(this.rpcQueue, {durable: false});
         this.channel.assertExchange(this.rpcReplyExchange, 'fanout', {durable: false});
     }
