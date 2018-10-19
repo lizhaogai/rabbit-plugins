@@ -1,7 +1,6 @@
-const Connect = require('./connect');
-const PromiseA = require('bluebird');
+const Client = require('./client');
 
-class PubSub extends Connect {
+class PubSub extends Client {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts);

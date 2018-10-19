@@ -5,8 +5,9 @@ const debug = require('debug')('rabbit:service:rpc');
 const util = require('util');
 const amqp = require('amqplib/callback_api');
 const codecs = require('./codecs');
+const Router = require('./router');
 
-class Connect {
+class Client {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts};
         this.opts = opts = opts || {};
@@ -16,7 +17,8 @@ class Connect {
         this.connected = false;
         this.routers = [];
         this.$promise = null;
-        this.codec = codecs.byName(this.opts.format || 'json');
+        this.format(this.opts.format || 'json');
+        // this.codec = codecs.byName(this.opts.format || 'json');
         EventEmitter.call(this);
         this._connect();
     }
@@ -70,6 +72,74 @@ class Connect {
         this.codec = codecs.byName(fmt || 'json');
     }
 
+    publish(exchange, routingKey, content) {
+        var that = this;
+        return this.$promise.then(function () {
+            var channel = that.channel;
+            return PromiseA.try(function () {
+                content = that.bufferify(that.codec.encode(content));
+                return channel.publish(exchange, routingKey, content);
+            });
+        });
+    }
+
+    sendToQueue(queue, content) {
+        var that = this;
+        return this.$promise.then(function () {
+            var channel = that.channel;
+            return PromiseA.try(function () {
+                content = that.bufferify(that.codec.encode(content));
+                return channel.sendToQueue(queue, content);
+            });
+        });
+    }
+
+    route(route, options, handler) {
+        if (typeof options === 'function') {
+            handler = options;
+            options = null;
+        }
+
+        if (handler && handler.length > 1) {
+            deprecate('route handler signature changed from route(err, message) to route(message)');
+        }
+
+        function fn(message) {
+            if (!handler) return;
+            if (handler.length > 1) {
+                handler(null, message);
+            } else {
+                handler(message);
+            }
+        }
+
+        var that = this;
+        return this.$promise.then(function () {
+            var codec = that.codec;
+            options = options || {};
+            options.connection = that.conn;
+            var router = new Router(route, options, function (message) {
+                PromiseA.try(function () {
+                    message.payload = codec.decode(message.content);
+                    return fn(message);
+                }).then(function () {
+                    return message.ack();
+                }).catch(function (err) {
+                    debug('error', 'Error thrown in routing handler, not acking message. Error: ', err.stack);
+                    that.emit('error', err);
+                });
+            });
+            router.init();
+            that.routers.push(router);
+            return router.$promise;
+        });
+
+    }
+
+    subscribe(route, options, handler) {
+        return this.route(route, options, handler);
+    }
+
     close() {
         if (this.closing || this.closed) {
             return PromiseA.resolve();
@@ -89,20 +159,17 @@ class Connect {
             that.closing = false;
         });
     }
-
-    start() {
-        this._connect().then(() => {
-            this._start && this._start()
-        })
-    }
 }
 
 function close_connection(conn) {
     if (!conn || conn.closing || conn.closed) return PromiseA.resolve();
+    conn.closing = true;
     return PromiseA.try(function () {
         return new PromiseA(function (resolve) {
             conn.once('close', function () {
                 resolve();
+                conn.closed = true;
+                conn.closing = false;
             });
             conn.close();
         });
@@ -111,6 +178,6 @@ function close_connection(conn) {
     });
 }
 
-util.inherits(Connect, EventEmitter);
+util.inherits(Client, EventEmitter);
 
-module.exports = Connect;
+module.exports = Client;
