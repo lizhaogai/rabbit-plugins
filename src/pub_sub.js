@@ -5,9 +5,9 @@ class PubSub extends Client {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts);
-        this.pubSubEx = 'rabbit:pubsub:ex';
-        this.topicPrefix = opts.topicPrefix || 'rabbit:pubsub:';
-        this.topicSuffix = opts.topicSuffix || ':$';
+        this.pubSubEx = 'rabbit$pubsub$ex';
+        this.topicPrefix = opts.topicPrefix || 'rabbit$pubsub$';
+        this.topicSuffix = opts.topicSuffix || '$';
     }
 
     async _connect() {
@@ -20,23 +20,10 @@ class PubSub extends Client {
     }
 
     publish(topic, message) {
-        // topic = this.wrapTopic(topic);
-        // message = (typeof message === 'string') ? message : JSON.stringify(message);
-        // this.channel.publish(this.pubSubEx, topic, new Buffer(message));
         super.publish(this.pubSubEx, this.wrapTopic(topic), message);
     }
 
     subscribe(topic, fn) {
-        // let that = this;
-        // topic = this.wrapTopic(topic);
-        // that.channel.assertQueue('', {exclusive: true}, function (err, q) {
-        //     that.channel.bindQueue(q.queue, that.pubSubEx, topic);
-        //     that.channel.consume(q.queue, function (msg) {
-        //         let instance = JSON.parse(msg.content.toString());
-        //         fn(instance);
-        //     });
-        // });
-
         this.route(this.wrapTopic(topic), {
             exchange: this.pubSubEx,
             exchangeType: 'topic',

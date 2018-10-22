@@ -7,7 +7,7 @@ pub.$promise.then(() => {
     setInterval(function () {
         i++;
         pub.publish('test', i)
-    }, 1000);
+    }, 1);
 });
 
 

@@ -50,7 +50,6 @@ class Client {
                 this.emit('close');
             });
             conn.on('error', (e) => {
-                console.log(e);
                 this.connected = false;
                 this.emit('error');
             });

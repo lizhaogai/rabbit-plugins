@@ -6,12 +6,10 @@ pub.$promise.then(() => {
     console.log(1);
 });
 
-setTimeout(function(){
+pub.$promise.then(() => {
+    console.log(2);
     pub.$promise.then(() => {
-        console.log(2);
-        pub.$promise.then(() => {
-            console.log(3);
-        });
+        console.log(3);
     });
-},10000);
+});
 

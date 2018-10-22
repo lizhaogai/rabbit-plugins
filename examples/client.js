@@ -12,7 +12,7 @@ client.on('connected', () => {
         }).then(result => {
             console.log(JSON.stringify(result) + ':' + i);
         })
-    }, 1000);
+    }, 1);
 });
 
 
