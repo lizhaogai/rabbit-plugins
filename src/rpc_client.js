@@ -93,7 +93,6 @@ class Rpc_client extends RPC {
             const body = that.codec.encode({id, methodName, args, jsonrpc: '2.0'});
             debug('Send remote call ', body);
             const content = that.bufferify(body);
-            // that.channel.sendToQueue(that.rpcQueue, new Buffer(JSON.stringify({id, methodName, args, jsonrpc: '2.0'})));
             that.channel.sendToQueue(that.rpcQueue, content);
         });
         p.timeout = function (timeout) {
