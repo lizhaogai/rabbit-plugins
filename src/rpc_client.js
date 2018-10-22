@@ -18,9 +18,9 @@ class Rpc_client extends RPC {
 
     async _connect() {
         await super._connect();
-        let queneOpts = this.queueOpts;
-        queneOpts.exclusive = true;
-        let rpcReplyQueue = await PromiseA.fromCallback(cb => this.channel.assertQueue('', queneOpts, cb)).catch(e => {
+        let queueOpts = this.queueOpts;
+        queueOpts.exclusive = true;
+        let rpcReplyQueue = await PromiseA.fromCallback(cb => this.channel.assertQueue('', queueOpts, cb)).catch(e => {
             debug(e);
             return null;
         });
