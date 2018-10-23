@@ -1,6 +1,6 @@
-const Client = require('../src').RPCClient;
+const Client = require('../').RPCClient;
 
-let client = new Client('amqp://nevem:nevem@localhost/order');
+let client = new Client({url: 'amqp://nevem:nevem@localhost/order', namespace: 'test'});
 
 let i = 0;
 let timeInertal = null;
@@ -14,7 +14,6 @@ client.on('connected', () => {
         })
     }, 1);
 });
-
 
 
 client.on('close', function () {
