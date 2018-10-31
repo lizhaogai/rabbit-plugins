@@ -43,13 +43,14 @@ class Rpc_client extends RPC {
         that.channel.consume(this.rpcReplyQueue.queue, function (msg) {
             let instance = that.codec.decode(msg.content.toString());
             let {id, result} = instance;
+            that.channel.ack(msg);
             Object.keys(that.waitings).map(_id => {
                 if (_id === id) {
                     that.waitings[id].resolve(result);
                     delete that.waitings[id];
                 }
             });
-            that.channel.ack(msg);
+            // that.channel.ack(msg);
         });
     }
 
