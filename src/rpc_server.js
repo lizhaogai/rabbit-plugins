@@ -23,13 +23,13 @@ class Rpc_server extends RPC {
             try {
                 // let instance = JSON.parse(msg.content.toString());
                 debug('Receive remote call ', msg.content.toString());
+                that.channel.ack(msg);
                 let instance = that.codec.decode(msg.content.toString());
                 let {id, methodName, args} = instance;
                 if (that._rpcHandlers[methodName]) {
                     const handler = R.propOr(R.always(null), methodName, that._rpcHandlers);
                     const data = await handler.apply(handler, args);
                     const content = that.bufferify(that.codec.encode({id, result: data}));
-                    that.channel.ack(msg);
                     that.channel.publish(that.rpcReplyExchange, '', content);
                 }
             } catch (e) {
