@@ -104,7 +104,7 @@ function Router(route, options, handler) {
 
     this.cleanup = function (err) {
         console.error('Exiting due to connection error: ', err);
-        process.exit(-1);
+        // process.exit(-1);
     };
 
 }
