@@ -5,7 +5,7 @@ class PubSub extends Client {
     constructor(opts) {
         opts = (typeof opts) === 'object' ? opts : {url: opts}
         super(opts);
-        this.pubSubEx = 'rabbit$pubsub$ex';
+        this.pubSubEx = opts.exchange ? `rabbit$${opts.exchange}$ex` : 'rabbit$pubsub$ex';
         this.topicPrefix = opts.topicPrefix || 'rabbit$pubsub$';
         this.topicSuffix = opts.topicSuffix || '$';
     }
