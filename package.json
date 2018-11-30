@@ -1,6 +1,6 @@
 {
   "name": "rabbit-plugins",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "simple distributed RPC using rabbitmq",
   "main": "src/index.js",
   "scripts": {
