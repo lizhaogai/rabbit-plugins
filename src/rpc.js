@@ -7,12 +7,16 @@ class RPC extends Client {
     constructor(opts) {
         super(opts);
         this.rpcQueue = this.rpcQueue(opts.namespace);
-        this.rpcReplyExchange = rpcReplyExchange;
-        this.queueOpts = {durable: true, autoDelete: false, messageTtl: 30000, expires: 3600000};
+        this.rpcReplyExchange = this.replyExchange(opts.namespace);
+        this.queueOpts = {durable: true, autoDelete: false, messageTtl: 2000, expires: 3600000};
     }
 
     rpcQueue(queue) {
         return `rabbit:service:${queue}:queue` || rpcQueue;
+    }
+
+    replyExchange(namespace) {
+        return `rabbit:service:${namespace}:reply:exchange` || rpcReplyExchange;
     }
 
     async _connect() {
