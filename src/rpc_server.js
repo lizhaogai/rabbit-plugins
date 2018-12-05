@@ -25,7 +25,9 @@ class Rpc_server extends RPC {
                 debug('Receive remote call ', msg.content.toString());
                 that.channel.ack(msg);
                 let instance = that.codec.decode(msg.content.toString());
-                let {id, methodName, args} = instance;
+                let {id, methodName, method, args, params} = instance;
+                methodName = methodName || method;
+                args = args || params;
                 if (that._rpcHandlers[methodName]) {
                     const handler = R.propOr(R.always(null), methodName, that._rpcHandlers);
                     const data = await handler.apply(handler, args);
